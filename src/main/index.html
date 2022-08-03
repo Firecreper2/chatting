@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+	<link rel="stylesheet" href="./main/style.css">
+	<title>Chatting</title>
+</head>
+
+<body>
+	<div id="login">
+		<input type="text" id="username" placeholder="Username">
+		<input type="password" id="password" placeholder="Password">
+		<button id="login-button">Login</button>
+		<button id="signup-button">Sign Up</button>
+		<br>
+		<span id="response" aria-autocomplete="none"></span>
+	</div>
+	<div id="chat-box"></div>
+	<div id="message">
+		<input type="text" id="message-box" >
+	</div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="./main/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+body {
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+input {
+	width: 25vw;
+}
+#response {
+	font-size: 12px;
+}
+#login {
+	width: auto;
+	margin: auto;
+	border: 1px black solid;
+	padding: 10px;
+	height: 7vh;
+}
+#chat-box {
+	position: relative;
+	top: 5px;
+	width: auto;
+	margin: auto;
+	border: 1px black solid;
+	padding: 10px;
+	height: 65vh;
+}
+#message {
+	position: relative;
+	top: 10px;
+	width: auto;
+	margin: auto;
+	border: 1px black solid;
+	padding: 10px;
+	height: 6vh;
+}
+#message-box{
+	width: 89vw;
+	height: 5vh;
+	
+}
