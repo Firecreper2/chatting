@@ -22,6 +22,7 @@ input {
 	border: 1px black solid;
 	padding: 10px;
 	height: 65vh;
+	overflow-y: scroll;
 }
 #message {
 	position: relative;

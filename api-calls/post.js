@@ -9,6 +9,8 @@ async function login(req, res) {
 	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
 	Object.keys(accounts).forEach(account => {
 		if (accounts[account].username === username && accounts[account].password === password) {
+			res.cookie("username", username);
+			res.cookie("password", password);
 			res.send({ "message": "Login successful" });
 			valid = true;
 		}
@@ -19,8 +21,11 @@ const signup = async (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
 	let valid = true;
+	//get all accounts
 	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
 
+	//iterate for each account to see if the username is already
+	//in use
 	Object.keys(accounts).forEach(account => {
 		if (accounts[account].username === username) {
 			res.send({ "message": "Username already exists" });
@@ -28,15 +33,18 @@ const signup = async (req, res) => {
 		}
 	});
 	if (!valid) return;
+	//create new account index
 	accounts[username] = {};
 	accounts[username].username = username;
 	accounts[username].password = password;
+	//replace old json with new one!
 	fs.writeFileSync(previousDirectory + "\\accounts.json", JSON.stringify(accounts, null, 4));
+	//send 400
 	res.send({ "message": "Account created" });
 };
 
 const sendMessage = async (req, res) => {
-	const time = Date().toLocaleString()
+	let time = Date().toLocaleString()
 		.split(" ")[4] // get the time in the format "HH:MM:SS"
 		.split(":"); // split the time into an array
 	const message = req.body.message;
@@ -46,7 +54,19 @@ const sendMessage = async (req, res) => {
 		res.send({ "message": "Invalid account credentials" });
 		return;
 	}
-	let messageParsed = "[" + time[0] + ":" + time[1] + "] " + username + ": " + message;
+	//using 12 hour time, with time[0] being the hour
+	let AMPM = "";
+	if (time[0] >= 12) {
+		//allow 12 PM
+		if(time != "12") time -= 12;
+		AMPM = "PM";
+	} else {
+		//remove 00 AM
+		if(time[0] == "00") time[0] = "12";
+		AMPM = "AM";
+	}
+	//create message
+	let messageParsed = "[" + time[0] + ":" + time[1] + " " + AMPM + "] " + username + ": " + message;
 	let messages = fs.readFileSync(previousDirectory + "/messages.json");
 	messages = JSON.parse(messages);
 	messages.push(messageParsed);
@@ -54,6 +74,7 @@ const sendMessage = async (req, res) => {
 	res.send({ "message": "Message sent" });
 };
 const verifyAccount = (username, password) => {
+	if (!username || !password) return false;
 	const accounts = fs.readFileSync(previousDirectory + "/accounts.json");
 	const accountsJSON = JSON.parse(accounts);
 	return accountsJSON[username].password === password;

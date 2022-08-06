@@ -1,3 +1,5 @@
+//encryption
+const encryption = true;
 // establich socket.io connection
 // eslint-disable-next-line no-undef
 const socket = io();
@@ -7,14 +9,19 @@ socket.on("messageRecieved", () => {
 	getMessages();
 });
 
+//store data in local storage
 let userdata = {
 	username: "",
 	password: ""
 };
 
-const login = async function () {
-	const username = document.getElementById("username").value;
-	const password = document.getElementById("password").value;
+//login
+const login = async function (user, pass) {
+	const username = user || document.getElementById("username").value;
+	const password = pass || document.getElementById("password").value;
+	// if (encryption) {
+	// 	const encrypted = await encrypt(password);
+	// }
 	const responseText = document.getElementById("response");
 
 	if (username.length < 3 || password.length < 3) {
@@ -43,10 +50,11 @@ const login = async function () {
 		userdata.password = password;
 	} else {
 		responseText.style.color = "red";
-		responseText.innerHTML = "Login failed";
+		responseText.innerHTML = "Username or password is incorrect";
 	}
 };
 
+//signup
 const signup = async function () {
 	const username = document.getElementById("username").value;
 	const password = document.getElementById("password").value;
@@ -81,12 +89,11 @@ const signup = async function () {
 	}
 };
 
+//send message
 const sendMessage = async function (message) {
-	if(message.length < 1) return;
-	if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-		document.getElementById("message").focus();
-	}
+	if (message.length < 1) return;
 	document.getElementById("message-box").value = "";
+	//tells the api to send a message
 	const response = await fetch("/api/sendMessage", {
 		method: "POST",
 		headers: {
@@ -100,19 +107,47 @@ const sendMessage = async function (message) {
 	});
 	const content = await response.json();
 	console.log(content);
+	//Tells the server to get the new messages
 	socket.emit("messageSent");
 };
 
+//get messages
 const getMessages = async function () {
 	const response = await fetch("/api/getmessages");
 	const content = await response.json();
 	const messages = document.getElementById("chat-box");
-	console.log(response);
 	messages.innerHTML = "";
 	for (let i = 0; i < content.length; i++) {
 		messages.innerHTML += "<div class='message'>" + content[i] + "</div>";
 	}
+	//wait so that the items load before scrolling... promises did not go well
+	setTimeout(scrollToBottom);
 };
+
+//get cookies
+const getCookie = function (cname) {
+	let name = cname + "=";
+	let decodedCookie = decodeURIComponent(document.cookie);
+	let ca = decodedCookie.split(";");
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == " ") {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+};
+
+//scroll to bottom
+const scrollToBottom = function () {
+	setTimeout(() => {
+		document.getElementById("chat-box").scrollTo(0, document.getElementById("chat-box").scrollHeight);
+	}, 10);
+};
+
 
 // Login buttons
 document.getElementById("login-button").addEventListener("click", () => { login(); });
@@ -128,3 +163,13 @@ document.addEventListener("keydown", (e) => {
 
 //Load messages
 getMessages();
+
+//Periodically check for new messages
+setInterval(getMessages, 10000);
+
+//automatically log in if cookie exists
+if (getCookie("username") !== "") {
+	userdata.username = getCookie("username");
+	userdata.password = getCookie("password");
+	login(userdata.username, userdata.password);
+}
