@@ -41,5 +41,5 @@ app.use((req, res) => res.status(404).send("404 page not found"));
 
 //Listen!
 server.listen(8080, () => {
-	console.log("Poggers (it up)");
+	console.log("it up lol");
 });
