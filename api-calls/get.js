@@ -4,7 +4,8 @@ const getMessages = async function (req,res) {
 	let rootDir = __dirname.split("\\");
 	rootDir.pop();
 	rootDir = rootDir.join("\\");
-	const messages = JSON.parse(fs.readFileSync("messages.json"));
+	console.log(rootDir+" # messagesfolder")
+	const messages = JSON.parse(fs.readFileSync(rootDir+"\\messages.json"));
 	res.send(messages);
 };
 
