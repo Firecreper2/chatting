@@ -23,6 +23,7 @@ const signup = async (req, res) => {
 	let valid = true;
 	//get all accounts
 	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
+	console.log(accounts)
 
 	//iterate for each account to see if the username is already
 	//in use
