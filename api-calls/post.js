@@ -22,7 +22,7 @@ const signup = async (req, res) => {
 	const password = req.body.password;
 	let valid = true;
 	//get all accounts
-	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
+	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
 
 	//iterate for each account to see if the username is already
 	//in use
@@ -38,7 +38,7 @@ const signup = async (req, res) => {
 	accounts[username].username = username;
 	accounts[username].password = password;
 	//replace old json with new one!
-	fs.writeFileSync(previousDirectory + "\\accounts.json", JSON.stringify(accounts, null, 4));
+ 	fs.writeFileSync("./accounts.json", JSON.stringify(accounts, null, 4));
 	//send 400
 	res.send({ "message": "Account created" });
 };
@@ -67,7 +67,7 @@ const sendMessage = async (req, res) => {
 	}
 	//create message
 	let messageParsed = "[" + time[0] + ":" + time[1] + " " + AMPM + "] " + username + ": " + message;
-	let messages = fs.readFileSync(previousDirectory + "/messages.json");
+	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
 	messages.push(messageParsed);
 	fs.writeFileSync(previousDirectory + "/messages.json", JSON.stringify(messages, null, 4));
@@ -75,7 +75,7 @@ const sendMessage = async (req, res) => {
 };
 const verifyAccount = (username, password) => {
 	if (!username || !password) return false;
-	const accounts = fs.readFileSync(previousDirectory + "/accounts.json");
+	const accounts = fs.readFileSync("./accounts.json");
 	const accountsJSON = JSON.parse(accounts);
 	return accountsJSON[username].password === password;
 };
