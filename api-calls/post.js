@@ -6,7 +6,7 @@ async function login(req, res) {
 	const username = req.body.username;
 	const password = req.body.password;
 	let valid = false;
-	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
+	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
 	Object.keys(accounts).forEach(account => {
 		if (accounts[account].username === username && accounts[account].password === password) {
 			res.cookie("username", username);
