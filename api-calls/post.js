@@ -57,8 +57,9 @@ const sendMessage = async (req, res) => {
 		res.send({ "message": "Invalid account credentials" });
 		return;
 	}
-	//using 12 hour time, with time[0] being the hour
 	let AMPM = "";
+	//convert hour to EST
+	hour = hour + (time.getTimezoneOffset()/60) - 5
 	if (hour >= 12) {
 		//allow 12 PM
 		if(hour != 12) hour -= 12;
