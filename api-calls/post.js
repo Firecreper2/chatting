@@ -71,10 +71,12 @@ const sendMessage = async (req, res) => {
 	if (hour < 10){
 		hour = "0"+hour
 	}
+	if (minute < 10){
+		minute = "0"+minute
+	}
 	//create message
-	console.log("Message at " + hour + ":" + minute + " " + AMPM)
+	console.log(username+" sent "+message+" at " + hour + ":" + minute + " " + AMPM)
 	let messageParsed = "[" + hour + ":" + minute + " " + AMPM + "] " + username + ": " + message;
-	messageParsed = username + ": " + message;
 	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
 	if(messages.length > 99){
