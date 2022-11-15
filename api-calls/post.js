@@ -73,6 +73,9 @@ const sendMessage = async (req, res) => {
 	messageParsed = username + ": " + message;
 	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
+	if(messages.length > 99){
+		messages.shift()
+	}
 	messages.push(messageParsed);
 	fs.writeFileSync("./messages.json", JSON.stringify(messages, null, 4));
 	res.send({ "message": "Message sent" });
