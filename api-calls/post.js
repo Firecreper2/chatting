@@ -70,6 +70,7 @@ const sendMessage = async (req, res) => {
 	}
 	//create message
 	let messageParsed = "[" + time[0] + ":" + time[1] + " " + AMPM + "] " + username + ": " + message;
+	messageParsed = username + ": " + message;
 	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
 	messages.push(messageParsed);
