@@ -22,12 +22,13 @@ const signup = async (req, res) => {
 	const password = req.body.password;
 	let valid = true;
 	//get all accounts
-	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
+	let accounts = JSON.parse(fs.readFileSync("./accounts.json"));
 	console.log(accounts)
 
 	//iterate for each account to see if the username is already
 	//in use
 	Object.keys(accounts).forEach(account => {
+		console.log(accounts)
 		if (accounts[account].username === username) {
 			res.send({ "message": "Username already exists" });
 			valid = false;
@@ -38,6 +39,7 @@ const signup = async (req, res) => {
 	accounts[username] = {};
 	accounts[username].username = username;
 	accounts[username].password = password;
+	console.log(accounts)
 	//replace old json with new one!
  	fs.writeFileSync("./accounts.json", JSON.stringify(accounts, null, 4));
 	//send 400
@@ -71,7 +73,7 @@ const sendMessage = async (req, res) => {
 	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
 	messages.push(messageParsed);
-	fs.writeFileSync(previousDirectory + "/messages.json", JSON.stringify(messages, null, 4));
+	fs.writeFileSync("./messages.json", JSON.stringify(messages, null, 4));
 	res.send({ "message": "Message sent" });
 };
 const verifyAccount = (username, password) => {
