@@ -47,9 +47,9 @@ const signup = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-	let time = Date().toLocaleString()
-		.split(" ")[4] // get the time in the format "HH:MM:SS"
-		.split(":"); // split the time into an array
+	let time = new Date()
+	let hour = time.getHours()
+	let minute = time.getMinutes()
 	const message = req.body.message;
 	const username = req.body.username;
 	const password = req.body.password;
@@ -59,17 +59,20 @@ const sendMessage = async (req, res) => {
 	}
 	//using 12 hour time, with time[0] being the hour
 	let AMPM = "";
-	if (time[0] >= 12) {
+	if (hour >= 12) {
 		//allow 12 PM
-		if(time != "12") time -= 12;
+		if(hour != 12) hour -= 12;
 		AMPM = "PM";
 	} else {
 		//remove 00 AM
-		if(time[0] == "00") time[0] = "12";
+		if(hour == "00") hour = 12;
 		AMPM = "AM";
 	}
+	if (hour < 10){
+		hour = "0"+hour
+	}
 	//create message
-	let messageParsed = "[" + time[0] + ":" + time[1] + " " + AMPM + "] " + username + ": " + message;
+	let messageParsed = "[" + hour + ":" + minute + " " + AMPM + "] " + username + ": " + message;
 	messageParsed = username + ": " + message;
 	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
