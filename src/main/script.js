@@ -1,5 +1,3 @@
-//encryption
-const encryption = true;
 // establich socket.io connection
 // eslint-disable-next-line no-undef
 const socket = io();
@@ -9,16 +7,25 @@ socket.on("messageRecieved", () => {
 	getMessages();
 });
 
-//store data in local storage
+//store data in a variable
 let userdata = {
 	username: "",
 	password: ""
 };
 
+//encrypt
+const encrypt = async function (text) {
+	let buffer = new TextEncoder().encode(text);
+	buffer = await crypto.subtle.digest("SHA-256", buffer);
+	return Array.from(new Uint8Array(buffer))
+		.map(b => b.toString(16).padStart(2, "0")).join("");
+};
+
 //login
-const login = async function (user, pass) {
+const login = async function (user, pass, encrypted = false) {
 	const username = user || document.getElementById("username").value;
-	const password = pass || document.getElementById("password").value;
+	let password = document.getElementById("password").value || pass;
+	if(!encrypted) password = await encrypt(password);
 	// if (encryption) {
 	// 	const encrypted = await encrypt(password);
 	// }
@@ -57,7 +64,7 @@ const login = async function (user, pass) {
 //signup
 const signup = async function () {
 	const username = document.getElementById("username").value;
-	const password = document.getElementById("password").value;
+	const password = await encrypt(document.getElementById("password").value);
 	const responseText = document.getElementById("response");
 
 	if (username.length < 3 || password.length < 3) {
@@ -171,5 +178,5 @@ setInterval(getMessages, 10000);
 if (getCookie("username") !== "") {
 	userdata.username = getCookie("username");
 	userdata.password = getCookie("password");
-	login(userdata.username, userdata.password);
+	login(userdata.username, userdata.password, true);
 }

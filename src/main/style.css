@@ -34,7 +34,7 @@ input {
 	height: 6vh;
 }
 #message-box{
-	width: 89vw;
+	width: 100%;
 	height: 5vh;
 	
 }

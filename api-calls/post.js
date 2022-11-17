@@ -1,12 +1,9 @@
 const fs = require("fs");
-let previousDirectory = __dirname.split("\\");
-previousDirectory.pop();
-previousDirectory = previousDirectory.join("\\");
 async function login(req, res) {
 	const username = req.body.username;
 	const password = req.body.password;
 	let valid = false;
-	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
+	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
 	Object.keys(accounts).forEach(account => {
 		if (accounts[account].username === username && accounts[account].password === password) {
 			res.cookie("username", username);
@@ -22,7 +19,7 @@ const signup = async (req, res) => {
 	const password = req.body.password;
 	let valid = true;
 	//get all accounts
-	const accounts = JSON.parse(fs.readFileSync(previousDirectory + "\\accounts.json"));
+	const accounts = JSON.parse(fs.readFileSync("./accounts.json"));
 
 	//iterate for each account to see if the username is already
 	//in use
@@ -38,15 +35,15 @@ const signup = async (req, res) => {
 	accounts[username].username = username;
 	accounts[username].password = password;
 	//replace old json with new one!
-	fs.writeFileSync(previousDirectory + "\\accounts.json", JSON.stringify(accounts, null, 4));
+	fs.writeFileSync("./accounts.json", JSON.stringify(accounts, null, 4));
 	//send 400
 	res.send({ "message": "Account created" });
 };
 
 const sendMessage = async (req, res) => {
-	let time = Date().toLocaleString()
-		.split(" ")[4] // get the time in the format "HH:MM:SS"
-		.split(":"); // split the time into an array
+	let time = new Date();
+	let hour = time.getHours();
+	let minute = time.getMinutes();
 	const message = req.body.message;
 	const username = req.body.username;
 	const password = req.body.password;
@@ -54,28 +51,37 @@ const sendMessage = async (req, res) => {
 		res.send({ "message": "Invalid account credentials" });
 		return;
 	}
-	//using 12 hour time, with time[0] being the hour
 	let AMPM = "";
-	if (time[0] >= 12) {
+	//convert hour to EST
+	hour = hour + (time.getTimezoneOffset() / 60) - 5;
+	if (hour >= 12) {
 		//allow 12 PM
-		if(time != "12") time -= 12;
+		if (hour != 12) hour -= 12;
 		AMPM = "PM";
 	} else {
 		//remove 00 AM
-		if(time[0] == "00") time[0] = "12";
+		if (hour == "00") hour = 12;
 		AMPM = "AM";
 	}
+	if (hour < 10) {
+		hour = "0" + hour;
+	}
+	if (minute < 10) {
+		minute = "0" + minute;
+	}
 	//create message
-	let messageParsed = "[" + time[0] + ":" + time[1] + " " + AMPM + "] " + username + ": " + message;
-	let messages = fs.readFileSync(previousDirectory + "/messages.json");
+	// console.log(username + " sent " + message + " at " + hour + ":" + minute + " " + AMPM);
+	let messageParsed = "[" + hour + ":" + minute + " " + AMPM + "] " + username + ": " + message;
+	let messages = fs.readFileSync("./messages.json");
 	messages = JSON.parse(messages);
 	messages.push(messageParsed);
-	fs.writeFileSync(previousDirectory + "/messages.json", JSON.stringify(messages, null, 4));
+	if (messages.length > 200) messages.shift();
+	fs.writeFileSync("./messages.json", JSON.stringify(messages, null, 4));
 	res.send({ "message": "Message sent" });
 };
 const verifyAccount = (username, password) => {
 	if (!username || !password) return false;
-	const accounts = fs.readFileSync(previousDirectory + "/accounts.json");
+	const accounts = fs.readFileSync("./accounts.json");
 	const accountsJSON = JSON.parse(accounts);
 	return accountsJSON[username].password === password;
 };
